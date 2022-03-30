@@ -1,12 +1,12 @@
 import React from "react";
 import {View, Text} from "react-native";
 
-export default function Accounts(){
+export default function UserLogged(){
     return(
         <View>
             <Text>
-                Accounts..screen
-            </Text>
+                UserLogged..screen
+            </Text> 
         </View>
     );
 }
