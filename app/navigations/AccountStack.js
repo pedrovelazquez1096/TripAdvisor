@@ -2,6 +2,7 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Account from "../screens/Account/Account"
 import Login from "../screens/Account/Login";
+import SignUp from "../screens/Account/SignUp";
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,11 @@ export default function AccountStack(){
                 name="login"
                 component={Login}
                 options={{title: "Iniciar sesion"}}
+            />
+            <Stack.Screen
+                name="signup"
+                component={SignUp}
+                options={{title: "Registro"}}
             />
         </Stack.Navigator>
     );
