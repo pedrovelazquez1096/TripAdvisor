@@ -20,7 +20,7 @@ export default function SignUp(){
             <View style={styles.viewForm}>
                 <SignUpForm toastRef={toastRef}/>
             </View>
-            <Toast ref={toastRef} position="center" opacity={0.9} />
+            <Toast ref={toastRef} position="center" opacity={0.9} fadeOutDuration={1800}/>
         </KeyboardAwareScrollView>
     );
 }

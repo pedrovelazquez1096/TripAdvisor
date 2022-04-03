@@ -10,14 +10,17 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "~1.15.0",
     "@react-native-community/masked-view": "~0.1.6",
     "@react-navigation/bottom-tabs": "~5.2.6",
     "@react-navigation/native": "~5.1.5",
     "@react-navigation/stack": "~5.2.10",
     "add": "^2.0.6",
+    "axios": "^0.26.1",
     "expo": "~44.0.0",
     "expo-status-bar": "~1.2.0",
     "lodash": "^4.17.21",
+    "qs": "^6.10.3",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
