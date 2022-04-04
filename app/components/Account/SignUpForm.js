@@ -7,6 +7,7 @@ import { size, isEmpty, rest } from "lodash";
 import { AXIOS, AXIOS_LOGIN } from "../../utils/AxiosInstance";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "../../utils/StorageKeys";
 import { useNavigation } from "@react-navigation/native";
+import Loading from "../Loading";
 
 export default function SignUpForm(props){
     const navigation = useNavigation();
@@ -15,40 +16,85 @@ export default function SignUpForm(props){
     const [showPsw, setShowPsw] = useState(false);
     const [showPswConfirm, setshowPswConfirm] = useState(false);
     const [enableConfirmationFields, setenableConfirmationFields] = useState(false);
+    const [errorName, setErrorName] = useState("");
+    const [errorEmail, setErrorEmail] = useState("");
+    const [errorPass, setErrorPass] = useState("");
+    const [errorRepeatPass, setErrorRepeatPass] = useState("");
+    const [errorCode, setErrorCode] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [loadingText, setLoadingText] = useState("");
 
     const [formData, setformData] = useState(defaultFormValues());
     const [formDataNewCode, setformDataNewCode] = useState(defutalFormRequestNewCode())
     const [formDataOfficial, setformDataOfficial] = useState(defaultFormOfficialValues());
     const [confirmationForm, setconfirmationForm] = useState(defaultFormConfirmationValues());
 
-    //change this to redirect
+
     const onSubmit = async () => {
-        if(
-            isEmpty(formData.email) ||
-            isEmpty(formData.password) ||
-            isEmpty(formData.passwordRepeat) ||
-            isEmpty(formData.name)){
-            toastRef.current.show("Tu Nombre, Correo y contaseña necesarios");
+        if(isEmpty(formData.name)){
+            console.log("nombre vacio");
+            setErrorName("Tu nombre es necesario");
+        }else{
+            console.log("nombre no vacio");
+            setErrorName("");
         }
-        else if(!validateEmail(formData.email)){
-            toastRef.current.show("Email invalido");
+
+        if(isEmpty(formData.email)){
+            console.log("email vacio");
+            setErrorEmail("Tu email es obligatorio");
+        }else{
+            console.log("email no vacio");
+            setErrorEmail("");
+        }
+
+        if(isEmpty(formData.password)){
+            console.log("contraseña vacio");
+            setErrorPass("Una contraseña es necesaria");
+        }else{
+            console.log("contraseña no vacio");
+            setErrorPass("");
+        }
+
+        if(isEmpty(formData.passwordRepeat)){
+            console.log("passwordRepeat vacio");
+            setErrorRepeatPass("Repite tu constraseña");
+        }else{
+            console.log("passwordRepeat no vacio");
+            setErrorRepeatPass("");
+        }
+
+        if(size(formData.email) > 0 &&  !validateEmail(formData.email)){
+            console.log("email invalido");
+            setErrorEmail("Email no valido");
         }
         else if(formData.password !== formData.passwordRepeat){
-            toastRef.current.show("contraseña deben ser iguales");
+            console.log("Pass diferentes");
+            setErrorRepeatPass("Las contraseñas deben de ser iguales");
         }
-        else if(size(formData.password) < 6){
-            toastRef.current.show("la contraseña debe ser minimo 6 caracteres");
+        else if(size(formData.password) < 8){
+            console.log("pass corta");
+            setErrorPass("la contraseña debe ser minimo 8 caracteres");
         }
         else{
+            console.log("haciendo registro");
+            setLoadingText("Registrandote");
+            setIsLoading(true);
             const result = await AXIOS().post('/signup/registration', formDataOfficial);
-            //console.log(result.data);
+            if(result !== null)
+                setIsLoading(false);
+            console.log(result.data);
             const statusCode = result.data.statusCode;
-            if(statusCode !== 201){
-                toastRef.current.show(result.data.data.error);
-            }else{  
+            if(statusCode === 201){
                 toastRef.current.show("Revisa tu email para obterner tu codigo");
                 setenableConfirmationFields(true);
+            }else{
+                if(result.data.messange === "invalid email")
+                    setErrorEmail("Email no valido");
+                else if(result.data.messange == "invalid password")
+                    setErrorPass(result.data.data.error);
             }
+
+            console.log("Registration");
         }
         
     }
@@ -56,29 +102,42 @@ export default function SignUpForm(props){
     const onSubmitConfirmationCode = async () => {
         console.log(confirmationForm);
         if(isEmpty(confirmationForm.code)){
-            toastRef.current.show("El codigo de confirmacion es obligatorio");
+            setErrorCode("El codigo de confirmacion es obligatorio");
         }else if(size(confirmationForm.code) < 4 || size(confirmationForm.code) > 4){
-            toastRef.current.show("El codigo es de 4 numeros");
+            setErrorCode("El codigo es de 4 numeros");
         }else{
+            setErrorCode("");
+            setLoadingText("Confirmando tu cuenta");
+            setIsLoading(true);
             const result = await AXIOS().get('/signup/confirmation?email=' + confirmationForm.email +'&code=' + confirmationForm.code);
+
             if(result.data.statusCode === 202)
             {   
-                console.log("cuanta confirmada")
+                console.log("cuanta confirmada");
+                setLoadingText("Iniciando Sesion");
                 const result2 = await AXIOS_LOGIN(formDataOfficial.email, formDataOfficial.password);
                 if(result2.data.statusCode === 200)
                 {
                     console.log("loggeando cuenta");
                     await AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(), result2.data.data.access_token);
                     await AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(), result2.data.data.refresh_token);
-                    console.log("Tokens guardados");
                     //navigation.navigate("account");
-
                 }else{
                     toastRef.current.show(result2.data.messange);
                 }
             }else{
-                toastRef.current.show(result.data.messange);
+                if(result.data.messange === "invalid email")
+                    setErrorEmail("Email no valido");
+                else if(result.data.messange === "Confirmation code incorrect")
+                    setErrorCode("Codigo de confirmacion incorrecto");
+                else if(result.data.messange === "Confirmation code has expired")
+                    setErrorCode("El codigo de confirmacion ha expirado");
+                else if(result.data.messange === "Account already unlocked")
+                    setErrorEmail("Esta cuanta ya ha sido desbloqueada");
+                else if(result.data.messange === "User Not Found")
+                    setErrorEmail("Este email aun no está registrado, intenta registrarte");
             }
+            setIsLoading(false);
         }
     }
 
@@ -99,10 +158,12 @@ export default function SignUpForm(props){
 
     return(
         <View style={styles.formContainer}>
+            <Loading isVisible={isLoading} text={loadingText}/>
             <Input
                 placeholder="Nombre Completo"
                 containerStyle={styles.inputForm}
                 onChange={(e) => onChange(e, "name")}
+                errorMessage={errorName}
                 rightIcon={
                     <Icon
                          type="material-community"
@@ -116,6 +177,7 @@ export default function SignUpForm(props){
                 placeholder="Correo Electronico"
                 containerStyle={styles.inputForm}
                 onChange={(e) => onChange(e, "email")}
+                errorMessage={errorEmail}
                 rightIcon={
                     <Icon
                          type="material-community"
@@ -131,6 +193,7 @@ export default function SignUpForm(props){
                 password={true}
                 secureTextEntry={!showPsw}
                 onChange={(e) => onChange(e, "password")}
+                errorMessage={errorPass}
                 rightIcon={
                     <Icon
                          type="material-community"
@@ -146,6 +209,7 @@ export default function SignUpForm(props){
                 password={true}
                 secureTextEntry={!showPswConfirm}
                 onChange={(e) => onChange(e, "passwordRepeat")}
+                errorMessage={errorRepeatPass}
                 rightIcon={
                     <Icon
                          type="material-community"
@@ -160,6 +224,7 @@ export default function SignUpForm(props){
                 placeholder={enableConfirmationFields ? "Introduce tu codigo": "Solicita tu codigo"}
                 containerStyle={styles.inputForm}
                 onChange={(e) => onChangeConfirmation(e, "code")}
+                errorMessage={errorCode}
                 rightIcon={
                     <Icon
                         type="material-community"
@@ -186,6 +251,16 @@ export default function SignUpForm(props){
             </Text>
         </View>
     )
+}
+
+function defaultRenderErrorMessage(){
+    return{
+        name: "",
+        email: "",
+        pass: "",
+        repeatPass: "",
+        code: "",
+    }
 }
 
 function defutalFormRequestNewCode(){
