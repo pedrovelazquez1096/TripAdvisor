@@ -121,7 +121,7 @@ export default function SignUpForm(props){
                     console.log("loggeando cuenta");
                     await AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(), result2.data.data.access_token);
                     await AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(), result2.data.data.refresh_token);
-                    //navigation.navigate("account");
+                    navigation.navigate("account");
                 }else{
                     toastRef.current.show(result2.data.messange);
                 }

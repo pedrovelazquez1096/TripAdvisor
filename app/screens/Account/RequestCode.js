@@ -71,7 +71,8 @@ export default function RequestCode(){
                 setIsLoading(false);
             if(result.data.statusCode === 202) {
                 console.log("Cuenta confirmada");
-                navigation.navigate("account");
+                console.log("navigate to Sign In")
+                //navigation.navigate("account");
             }else{
                 if(result.data.messange === "invalid email")
                     setErrorEmail("Email no valido");
