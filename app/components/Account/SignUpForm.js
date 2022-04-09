@@ -3,7 +3,7 @@ import { StyleSheet, View, Text} from "react-native";
 import { Input, Icon, Button } from "react-native-elements";
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { validateEmail } from "../../utils/Validations";
-import { size, isEmpty, rest } from "lodash";
+import { size, isEmpty } from "lodash";
 import { AXIOS, AXIOS_LOGIN } from "../../utils/AxiosInstance";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "../../utils/StorageKeys";
 import { useNavigation } from "@react-navigation/native";
@@ -79,22 +79,29 @@ export default function SignUpForm(props){
             console.log("haciendo registro");
             setLoadingText("Registrandote");
             setIsLoading(true);
-            const result = await AXIOS().post('/signup/registration', formDataOfficial);
-            if(result !== null)
+            await AXIOS().post('/signup/registration', formDataOfficial).then((result)=> {
+                if(result !== null)
+                    setIsLoading(false);
+                console.log(result.data);
+                const statusCode = result.data.statusCode;
+                if(statusCode === 201){
+                    toastRef.current.show("Revisa tu email para obterner tu codigo");
+                    setenableConfirmationFields(true);
+                }else if(statusCode === 409){
+                    toastRef.current.show("Ese correo ya está en uso, intenta iniciar sesion");
+                }
+                else{
+                    if(result.data.messange === "invalid email")
+                        setErrorEmail("Email no valido");
+                    else if(result.data.messange === "invalid password")
+                        setErrorPass(result.data.data.error);
+                }
+                console.log("Registration");
+            }).catch(() => {
                 setIsLoading(false);
-            console.log(result.data);
-            const statusCode = result.data.statusCode;
-            if(statusCode === 201){
-                toastRef.current.show("Revisa tu email para obterner tu codigo");
-                setenableConfirmationFields(true);
-            }else{
-                if(result.data.messange === "invalid email")
-                    setErrorEmail("Email no valido");
-                else if(result.data.messange == "invalid password")
-                    setErrorPass(result.data.data.error);
-            }
+                toastRef.current.show("No te pudimos registrarte, intenta de nuevo");
+            });
 
-            console.log("Registration");
         }
         
     }
@@ -120,7 +127,7 @@ export default function SignUpForm(props){
                 {
                     console.log("loggeando cuenta");
                     await AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(), result2.data.data.access_token);
-                    await AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(), result2.data.data.refresh_token);
+                    await AsyncStorageLib.setItem(REFRESH_TOKEN_KEY(), result2.data.data.refresh_token);
                     navigation.navigate("account");
                 }else{
                     toastRef.current.show(result2.data.messange);
@@ -251,16 +258,6 @@ export default function SignUpForm(props){
             </Text>
         </View>
     )
-}
-
-function defaultRenderErrorMessage(){
-    return{
-        name: "",
-        email: "",
-        pass: "",
-        repeatPass: "",
-        code: "",
-    }
 }
 
 function defutalFormRequestNewCode(){
