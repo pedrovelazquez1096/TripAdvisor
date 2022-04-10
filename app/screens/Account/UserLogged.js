@@ -4,7 +4,6 @@ import {ACCESS_TOKEN_KEY} from "../../utils/StorageKeys";
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 
 export default function UserLogged(props){
-
     const signout = () =>{
         AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(),"").then(
             () => {
@@ -13,9 +12,10 @@ export default function UserLogged(props){
         )
     }
 
+
     return(
         <View>
-            <Text>UserLogged..screen</Text>
+            <Text>Bienvenido {props.name}</Text>
             <Button title="Cerrar Sesión" onPress={() => signout()}/>
         </View>
     );

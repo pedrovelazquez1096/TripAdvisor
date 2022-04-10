@@ -2,6 +2,7 @@ import React from "react";
 import {StyleSheet, View, ScrollView, Text, Image} from "react-native";
 import { Divider } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
+import SignInForm from "../../components/Account/SignInForm";
 
 export default function Login(){
 
@@ -13,12 +14,32 @@ export default function Login(){
                 style={styles.logo}
             />
             <View style={styles.viewContainer}>
-                <Text>Login Form</Text>
+                <SignInForm/>
                 <CreateAccount/>
             </View>
             <Divider style={styles.divider} />
-            <Text>Social Login</Text>
+            <View style={styles.viewContainer}>
+                <ForgotPassword/>
+            </View>
         </ScrollView>
+    );
+}
+
+function ForgotPassword(){
+    //const navigation = useNavigation();
+    return(
+        <Text style={styles.textRegister}>
+            ¿Olvidaste tu contraseña? {" "}
+            <Text
+                style={styles.btnRegister}
+                onPress={() => {
+                    console.log("olvido passs")
+                    //navigation.navigate("signup")
+                }}
+            >
+                Recuperala aqui
+            </Text>
+        </Text>
     );
 }
 

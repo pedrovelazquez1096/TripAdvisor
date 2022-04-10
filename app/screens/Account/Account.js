@@ -6,6 +6,7 @@ import {isEmpty} from "lodash";
 import UserGuest from "./UserGuest";
 import UserLogged from "./UserLogged";
 import {useIsFocused} from "@react-navigation/native";
+import {AXIOS} from "../../utils/AxiosInstance";
 
 
    
@@ -14,14 +15,17 @@ import {useIsFocused} from "@react-navigation/native";
 export default function Accounts(){
     const [login, setLogin] = useState(null);
     const [ACCESS_TOKEN, setACCESS_TOKEN] = useState("");
+    const [name, setName] = useState("");
     const isFocused = useIsFocused();
 
     useEffect(() => {
         const fetchTokens = () =>{
-            console.log("use-effect de storage")
-            AsyncStorageLib.getItem(ACCESS_TOKEN_KEY()).then(access_token =>{
-                setACCESS_TOKEN(access_token);
-            });
+            if(!login) {
+                console.log("use-effect de storage: " + login);
+                AsyncStorageLib.getItem(ACCESS_TOKEN_KEY()).then(access_token => {
+                    setACCESS_TOKEN(access_token);
+                });
+            }
         }
         fetchTokens();
     }, [isFocused]);
@@ -30,12 +34,21 @@ export default function Accounts(){
     useEffect(() => {
         if (isEmpty(ACCESS_TOKEN))
             setLogin(false);
-        else
+        else {
             setLogin(true);
+            AXIOS().get('/users/me', {headers:{
+                    Authorization: 'Bearer ' + ACCESS_TOKEN
+                }}).then((result) =>{
+                if(result.data.data.me.name !== undefined)
+                    setName(result.data.data.me.name);
+            }).catch((e) => {
+                console.log(e);
+            })
+        }
     }, [ACCESS_TOKEN]);
 
 
     if(login === null || login === "null") return <Loading isVisible={true} text="cargando"/>;
 
-    return login ? <UserLogged set_access_token={setACCESS_TOKEN}/>: <UserGuest/>;
+    return login ? <UserLogged set_access_token={setACCESS_TOKEN} name={name}/>: <UserGuest/>;
 }
