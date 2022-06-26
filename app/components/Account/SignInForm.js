@@ -24,6 +24,7 @@ export default function SignInForm(){
     }
 
     const onSumit = async () =>{
+        console.log(signInForm);
         let ready = false;
         if(isEmpty(signInForm.email)){
             setErrorEmail("Tu email es obligatorio");

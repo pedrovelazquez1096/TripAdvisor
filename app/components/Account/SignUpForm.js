@@ -84,7 +84,7 @@ export default function SignUpForm(props){
                     setIsLoading(false);
                 console.log(result.data);
                 const statusCode = result.data.statusCode;
-                if(statusCode === 201){
+                if(statusCode === 202){
                     toastRef.current.show("Revisa tu email para obterner tu codigo");
                     setenableConfirmationFields(true);
                 }else if(statusCode === 409){
@@ -118,12 +118,12 @@ export default function SignUpForm(props){
             setIsLoading(true);
             const result = await AXIOS().get('/signup/confirmation?email=' + confirmationForm.email +'&code=' + confirmationForm.code);
 
-            if(result.data.statusCode === 202)
+            if(result.data.statusCode === 200)
             {   
                 console.log("cuanta confirmada");
                 setLoadingText("Iniciando Sesion");
                 const result2 = await AXIOS_LOGIN(formDataOfficial.email, formDataOfficial.password);
-                if(result2.data.statusCode === 200)
+                if(result2.data.statusCode === 200) 
                 {
                     console.log("loggeando cuenta");
                     await AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(), result2.data.data.access_token);

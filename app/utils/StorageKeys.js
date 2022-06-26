@@ -6,6 +6,9 @@ export function REFRESH_TOKEN_KEY(){
     return "REFRESH_TOKEN";
 }
 
+export function PROFILE_IMG(){
+    return "PROFILE_IMG";
+}
 
 // AsyncStorageLib.setItem(REFRESH_TOKEN_KEY, refresh_token);
 

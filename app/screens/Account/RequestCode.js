@@ -3,6 +3,8 @@ import {StyleSheet, View, Image} from "react-native";
 import { Input, Icon, Button } from "react-native-elements";
 import { size, isEmpty } from "lodash";
 import { AXIOS } from "../../utils/AxiosInstance";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "../../utils/StorageKeys";
+import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { validateEmail } from "../../utils/Validations";
@@ -69,10 +71,13 @@ export default function RequestCode(){
             let result = await AXIOS().get('/signup/confirmation?email=' + form.email +'&code=' + form.code);
             if(result !== null)
                 setIsLoading(false);
-            if(result.data.statusCode === 202) {
+            if(result.data.statusCode === 200) {
                 console.log("Cuenta confirmada");
                 console.log("navigate to Sign In")
-                //navigation.navigate("account");
+                navigation.navigate("account");
+                //TODO agregar la lectura de tokens y guardarlos
+                //await AsyncStorageLib.setItem(ACCESS_TOKEN_KEY(), result2.data.data.access_token);
+                //await AsyncStorageLib.setItem(REFRESH_TOKEN_KEY(), result2.data.data.refresh_token);
             }else{
                 if(result.data.messange === "invalid email")
                     setErrorEmail("Email no valido");
