@@ -1,16 +1,12 @@
 import React, {useState, useEffect} from "react";
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY} from "../../utils/StorageKeys";
-import Loading from "../../components/Loading"
+import Loading from "../../components/Shared/Loading/Loading";
 import {isEmpty} from "lodash";
 import UserGuest from "./UserGuest";
 import UserLogged from "./UserLogged";
 import {useIsFocused} from "@react-navigation/native";
 import {AXIOS} from "../../utils/AxiosInstance";
-
-
-   
-
 
 export default function Accounts(){
     const [login, setLogin] = useState(false);

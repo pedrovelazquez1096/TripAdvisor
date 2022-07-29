@@ -2,11 +2,12 @@ import React, {useState, useRef, useEffect} from "react";
 import {View, Text, StyleSheet} from "react-native";
 import { Button } from "react-native-elements";
 import Toast from "react-native-easy-toast";
-import Loading from "../../components/Loading";
+import Loading from "../../components/Shared/Loading/Loading";
 import {ACCESS_TOKEN_KEY} from "../../utils/StorageKeys";
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { stubArray } from "lodash";
 import InfoUser from "../../components/Account/InfoUser";
+import { AccountOptions } from "../../components/Account/AccountOptions";
 import { AXIOS } from "../../utils/AxiosInstance";
 
 export default function UserLogged(props){
@@ -27,10 +28,11 @@ export default function UserLogged(props){
     useEffect(() => {
       (async () => {
         const access_token = await AsyncStorageLib.getItem(ACCESS_TOKEN_KEY());
-        await AXIOS().get('/users/me', {headers:{
+        await AXIOS().get('/users/me', {headers:{ 
             Authorization: 'Bearer ' + access_token
         }}).then((result) =>{
             if(result.data.data.me.name !== undefined){
+                console.log(result.data.data.me);
                 setUserInfo(result.data.data.me);
             }
         }).catch((e) => {
@@ -45,9 +47,8 @@ export default function UserLogged(props){
 
     return(
         <View style={styles.viewUserInfo}>
-            {userInfo && <InfoUser userInfo={userInfo}/>}
-            <Text>Account Options</Text>
-            <Text>Bienvenido {props.name}</Text>
+            {userInfo && <InfoUser userInfo={userInfo} />}
+            <AccountOptions setUserInfo={setUserInfo}/>
             <Button 
                 title="Cerrar Sesión" 
                 onPress={() => signout()}

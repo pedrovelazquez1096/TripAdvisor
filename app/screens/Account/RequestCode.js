@@ -8,7 +8,7 @@ import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { validateEmail } from "../../utils/Validations";
-import Loading from "../../components/Loading";
+import Loading from "../../components/Shared/Loading/Loading";
 
 import Toast from "react-native-easy-toast";
 

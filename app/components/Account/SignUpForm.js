@@ -7,7 +7,7 @@ import { size, isEmpty } from "lodash";
 import { AXIOS, AXIOS_LOGIN } from "../../utils/AxiosInstance";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "../../utils/StorageKeys";
 import { useNavigation } from "@react-navigation/native";
-import Loading from "../Loading";
+import Loading from "../Shared/Loading/Loading";
 
 export default function SignUpForm(props){
     const navigation = useNavigation();

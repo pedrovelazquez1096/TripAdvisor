@@ -33,3 +33,25 @@ export function AXIOS_LOGIN(usernameP, passwordP){
         })
     );
 }
+
+export function updateImage(token, formdata, setimage, setloadingVisible, setLoadingText){
+    setloadingVisible(true);
+    const api = [baseURL_domain, '/images/profile/update'].join('');
+    const options = {
+        method: 'PUT',
+        body: formdata,
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'multipart/form-data',
+            'Authorization': 'Bearer ' + token,
+        },
+    };
+    fetch(api, options).then((response) => response.json())
+        .then((responseData) => {
+            //console.log(responseData.data.image);
+            setimage("data:image/jpeg;base64," + responseData.data.image);
+            setloadingVisible(false);
+            return responseData.data.image;
+        })
+    .catch(error => console.warn(error));
+}

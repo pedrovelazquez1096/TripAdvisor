@@ -1,28 +1,37 @@
-import React, {useState, useRef, useEffect}  from 'react'
+import React, {useState, useEffect}  from 'react'
 import { StyleSheet, View, Text } from 'react-native'
 import { Avatar } from 'react-native-elements';
 import { ACCESS_TOKEN_KEY } from '../../utils/StorageKeys';
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
-import { AxiosImage } from '../../utils/AxiosInstance';
+import { AxiosImage, updateImage } from '../../utils/AxiosInstance';
+import Loading from '../Shared/Loading/Loading';
 import * as ImagePicker from 'expo-image-picker';
+
 export default function InfoUser(props) {
     const {userInfo} = props;
     const [image, setimage] = useState(null)
+    const [loadingText, setLoadingText] = useState("");
+    const [loadingIsVisible, setloadingVisible] = useState(false);
     const photoURL = null;
     const [ACCESS_TOKEN, setACCESS_TOKEN] = useState("");
-
+    
     useEffect(() => {
         const fetchTokens = () =>{
             AsyncStorageLib.getItem(ACCESS_TOKEN_KEY()).then(access_token => {
                 setACCESS_TOKEN(access_token);
+                setloadingVisible(true);
             });
         }
+        
+        setLoadingText("Cargando perfil");
         fetchTokens();
 
         
         AxiosImage().get(userInfo.profileImageURL).then((result) =>{
-            setimage("data:image/jpeg;base64," + result.data.data.image);
-        })
+            if(result.data.data.image !== null)
+                setimage("data:image/jpeg;base64," + result.data.data.image);
+            setloadingVisible(false)
+        }).catch(e => {;})
     }, [])
     
     const changeAvatar = async () => {
@@ -31,16 +40,26 @@ export default function InfoUser(props) {
             allowsEditing: true,
             aspect: [4, 3]
         });
-        if(!result.cancelled) uploadProfileImage(result.uri);
+        if(!result.cancelled){ 
+            setLoadingText("Uploading new profile image");
+            uploadProfileImage(result.uri);
+        }
     }
 
     const uploadProfileImage = async (uri) =>{
-        const response = await fetch(uri);
-        const blob = await response.blob();
+        let uriParts = uri.split('.');
+        let fileType = uriParts[uriParts.length - 1];
+        
+        let formData = new FormData();
+        formData.append('image', {
+            uri,
+            name: `photo.${fileType}`,
+            type: `image/${fileType}`
+        });
 
-        console.log();
+        const newImage = updateImage(ACCESS_TOKEN, formData, setimage, setloadingVisible, setLoadingText);
     }
-
+ 
     return(
         <View style={styles.viewUserInfo}>
             <Avatar 
@@ -61,6 +80,7 @@ export default function InfoUser(props) {
                     {userInfo.email ? userInfo.email : "Anónimo"}
                 </Text>
             </View>
+            <Loading text={loadingText} isVisible={loadingIsVisible}/>
         </View>
     )
 }

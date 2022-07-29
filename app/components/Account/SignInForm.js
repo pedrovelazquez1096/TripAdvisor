@@ -7,7 +7,7 @@ import { validateEmail } from "../../utils/Validations";
 import { size, isEmpty } from "lodash";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "../../utils/StorageKeys";
 import { useNavigation } from "@react-navigation/native";
-import Loading from "../Loading";
+import Loading from "../Shared/Loading/Loading";
 
 export default function SignInForm(){
     const navigation = useNavigation();
