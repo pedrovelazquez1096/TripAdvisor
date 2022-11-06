@@ -11,7 +11,7 @@ import Loading from "../Shared/Loading/Loading";
 
 export default function SignUpForm(props){
     const navigation = useNavigation();
-
+  
     const { toastRef } = props;
     const [showPsw, setShowPsw] = useState(false);
     const [showPswConfirm, setshowPswConfirm] = useState(false);
